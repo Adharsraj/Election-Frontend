@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* .selected-row td {
+  filter: blur(1px);
+} */
