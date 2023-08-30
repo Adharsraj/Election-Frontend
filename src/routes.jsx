@@ -8,8 +8,8 @@ import ResultsUser from "./pages/User Pages/Main Pages/ResultsUser"
 import IndivudualResult from "./pages/User Pages/Main Pages/IndivudualResult"
 import AdminHome from "./pages/Admin Pages/AdminHome"
 import AdminCreateCandidate from "./pages/Admin Pages/AdminCreateCandidate"
-import AdminCreateElection from "./pages/Admin Pages/AdminCreateElection"
-import AdminCreateMember from "./pages/Admin Pages/AdminCreateMember"
+import AdminCreatePosition from "./pages/Admin Pages/AdminCreateElection"
+import AdminCreateUser from "./pages/Admin Pages/AdminCreateUser"
 import AdminNotVoted from "./pages/Admin Pages/AdminNotVoted"
 import AdminOfflineVote from "./pages/Admin Pages/AdminOfflineVote"
 import AdminTables from "./pages/Admin Pages/AdminTables"
@@ -62,11 +62,11 @@ const Router= createBrowserRouter([
     },
     {
         path:"/admin/createelection",
-        element:<AdminCreateElection/>
+        element:<AdminCreatePosition/>
     },
     {
-        path:"/admin/createmember",
-        element:<AdminCreateMember/>
+        path:"/admin/createuser",
+        element:<AdminCreateUser/>
     },
     {
         path:"/admin/notvoted",
@@ -76,8 +76,5 @@ const Router= createBrowserRouter([
         path:"/admin/offlinevote",
         element:<AdminOfflineVote/>
     },
-  
-
-
 ])
 export default Router

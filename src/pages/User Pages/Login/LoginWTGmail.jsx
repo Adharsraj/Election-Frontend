@@ -1,9 +1,54 @@
 import { Button, Card, Input } from "@material-tailwind/react";
-import React from "react";
+import React, { useState } from "react";
 import Lottie from "lottie-react";
 import mailgif from "../../../assets/mail.json";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axiosInstance from "../../../configs/axiosInstance";
+
 const LoginWTGmail = () => {
+  const navigate=useNavigate()
+  const [email,setEmail]=useState("")
+  const [otp, setOtp] = useState('');
+  const[status,changeStatus]=useState(false)
+const [message,setMessage]=useState("")
+  const sendOtp=async()=>{
+    console.log("i am email",email)
+  const res=await axiosInstance.post("/api/admin/sendemailotp",{email})
+  console.log(res)
+  changeStatus(true)
+
+  }
+  const verifyOtp = async () => {
+  
+    try {
+        const response=await axiosInstance.post("/api/admin/verifyemailotp",{email,otp})
+        console.log(response)
+        if (response.data.verified) {
+          console.log("inside verified")
+          setMessage('OTP verified successfully');
+          if (response.data.token) {
+            console.log("inside token")
+
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("User", JSON.stringify(response.data.User));
+            if (response.data.User.role === "user") {
+              navigate("/home");
+            } else if (response.data.User.role === "admin") {
+              navigate("/admin/home");
+            } else {
+              console.log("invalid person");
+            }
+        }} else {
+          console.log(object)('Invalid OTP');
+        }
+      
+    
+    } catch (error) {
+      console.log(error)
+    
+    }}
+    
+
   return (
     <div className="flex flex-col md:flex-row justify-center text-center items-center shadow-2xl  h-screen">
       <Card className="px-3 md:border">
@@ -22,12 +67,31 @@ const LoginWTGmail = () => {
               {" "}
               Login using Email{" "}
             </h1>
-            <Input size="lg" label="Enter Email " />
-            <Link to="/home">
-              <Button className="flex items-center justify-center gap-3 ">
+            {!status?
+            <>
+            <Input size="lg" label="Enter Email " name="email" onChange={(e)=>setEmail(e.target.value)} />
+              <Button onClick={sendOtp} className="flex items-center justify-center gap-3 ">
                 Send otp to mail
               </Button>
-            </Link>
+              </>
+           :
+<>
+           <Input
+           size="large"
+           label="Enter OTP"
+           value={otp}
+           name="otp"
+           onChange={(e) => setOtp(e.target.value)}
+         />
+         <Button onClick={verifyOtp}>Verify OTP</Button>
+         </>
+
+          }
+
+
+
+
+
             OR
             <Link to="/loginphone">
               <Button className="flex items-center justify-center gap-3 h-7 ">

@@ -174,6 +174,15 @@ export function SidebarWithCtaAdmin() {
                   Not Voted List
                 </ListItem>
               </Link>
+             
+              <Link to="/admin/createuser">
+                <ListItem className="text-white border mt-2 flex   text-lg">
+                  <ListItemPrefix>
+                    <UserIcon className="h-6 w-6 " />
+                  </ListItemPrefix>
+                  Create User
+                </ListItem>
+              </Link>
               <Link to="/admin/createelection">
                 <ListItem className="text-white border mt-2 flex  text-lg">
                   <ListItemPrefix>
@@ -182,22 +191,14 @@ export function SidebarWithCtaAdmin() {
                   Create Election
                 </ListItem>
               </Link>
-              <Link to="/">
-                <ListItem className="text-white border mt-2 flex   text-lg">
-                  <ListItemPrefix>
-                    <UserIcon className="h-6 w-6 " />
-                  </ListItemPrefix>
-                  Create Member
-                </ListItem>
-              </Link>
-              <Link to="/admin/createcandidate">
+              {/* <Link to="/admin/createcandidate">
                 <ListItem className="text-white border mt-2 flex   text-lg">
                   <ListItemPrefix>
                     <UserPlusIcon className="h-6 w-6 " />
                   </ListItemPrefix>
                   Create Candidate
                 </ListItem>
-              </Link>
+              </Link> */}
               <Link to="/admin/offlinevote">
                 <ListItem className="text-white border mt-2 flex   text-lg">
                   <ListItemPrefix>
