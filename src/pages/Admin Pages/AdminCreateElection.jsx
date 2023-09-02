@@ -1,47 +1,72 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { SidebarWithCtaAdmin } from "../../Components/UserComponents.jsx/SideNavbar";
 import { NavbarDefaultAdmin } from "../../Components/UserComponents.jsx/MobileNavbar";
-import icn1 from "../../assets/images/Alluser.png";
-import icn2 from "../../assets/images/ballot.png";
-import icn3 from "../../assets/images/Uicon.png";
-import { Form, Select, Button } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { Form, Select, Button, message } from "antd";
 import { Input } from "@material-tailwind/react";
+import axiosInstance from "../../configs/axiosInstance";
 
 
-const statisticsCardsData = [
-  {
-    icon: icn2,
-    title: "Total Elections",
-    value: `10`,
-  },
-  {
-    icon: icn3,
-    title: "Total Members",
-    value: `40`,
-  },
-  {
-    icon: icn1,
-    title: "Total Candidates",
-    value: `15`,
-  },
-];
+
 
 const AdminCreateElection = () => {
-  const { Option } = Select;
-  const [userImage, setUserImage] = useState(null);
+  const [rep, setRepresentative] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [form] = Form.useForm(); // Create a form instance
 
 
-  const onFinish = (values) => {
-    console.log("Received values of form: ", values);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        const response = await axiosInstance.get('/api/admin/showuser', { headers });
+        console.log(response)
+        setRepresentative(response.data.showUser);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSelectChange = (selectedValues) => {
+    setSelectedItems(selectedValues);
   };
-  const handleImageChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setUserImage(URL.createObjectURL(file));
+  const onFinish = async (formData) => {
+    const selectedUsernames = selectedItems.map((value) => {
+      const option = rep.find((item) => item._id === value);
+      return option ;
+    });
+
+    const dataToSend = {
+      ...formData,
+      representatives: selectedUsernames,
+    };
+    console.log("dataToSend",dataToSend)
+
+    try {
+      const token = localStorage.getItem("token");
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+      const response = await axiosInstance.post('/api/admin/electiondata', {dataToSend,headers});
+      console.log('Response from backend:', dataToSend);
+      form.resetFields();
+      message.success("Election created successfully!");
+
+      // Handle success or further actions here
+    } catch (error) {
+      console.error('Error sending data to backend:', error);
+      // Handle error here
     }
   };
+
+
   return (
     <div className="md:flex bg-gray-900 min-h-screen  max-h-fit text-white">
       <div className="hidden md:flex">
@@ -52,30 +77,31 @@ const AdminCreateElection = () => {
       </div>
       <div className="border bg-gray-50 justify-center lg:mt-0 lg:pt-0 mt-10 pt-10 items-center w-full  text-center flex  flex-col px-4">
         <h1 className=" md:text-5xl text-3xl rounded-xl text-white bg-gray-800 w-[80%] uppercase p-4 mb-2">Create  Election</h1>
-        <Form name="adminCreateUserForm" className="w-full px-10" onFinish={onFinish}>
+        <Form form={form}
+         name="adminCreateUserForm" className="w-full px-10" onFinish={onFinish}>
 
           <div className="md:flex w-full  border">
             <div className="w-full p-4 md:w-1/2 bg-white">
-            <Form.Item name="username" >
-                <Input label="Name of Election" />
+            <Form.Item name="electionName" >
+                <Input label="Name of Position" />
               </Form.Item>
-            <Form.Item name="currentPosition"  >
-            <Select
-                mode="multiple"
-                placeholder="Select Participants"
-                // value={selectedItems}
-                // onChange={setSelectedItems}
-                size='large'
-                style={{
-                  width: '100%',
-                }}
-                // options={rep.map(({ name, _id }) => ({
-                //   value: _id,
-                //   label: name,
-                // }))}
-                required
-              />
-</Form.Item>
+              <Form.Item name="representatives">
+      <Select
+        mode="multiple"
+        placeholder="Select Participants"
+        value={selectedItems}
+        onChange={handleSelectChange}
+        size="large"
+        style={{
+          width: '100%',
+        }}
+        options={rep.map(({ username, _id }) => ({
+          value: _id,
+          label: username,
+        }))}
+        required
+      />
+    </Form.Item>
 {/* <Form.Item name="currentPosition"  >
   <Select defaultValue="default" className="" >
     <Option value="default" disabled>Are u a previous board member</Option>
@@ -89,12 +115,12 @@ const AdminCreateElection = () => {
             
             </div>
             <div className="w-full p-4 md:w-1/2 bg-white">
-              <Form.Item name="presentAddress" >
-              <Input type="date" label='From Date' name="fromDate"  id="fromDate" required/>
+              <Form.Item name="startDate" >
+              <Input type="date" label='From Date' name="startDate"  id="startDate" required/>
                      </Form.Item>
             
-                     <Form.Item name="presentAddress" >
-              <Input type="date" label='To Date' name="toDate" id="toDate"required />       
+                     <Form.Item name="endDate" >
+              <Input type="date" label='To Date' name="endDate" id="endDate" required />       
                      </Form.Item>
 
               
@@ -108,6 +134,7 @@ const AdminCreateElection = () => {
         </Form>
       </div>
       </div>
+
   );
 };
 

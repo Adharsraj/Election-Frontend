@@ -4,6 +4,7 @@ import { NavbarDefault } from "../../../Components/UserComponents.jsx/MobileNavb
 import { IndivudualCandidateCard } from "../../../Components/UserComponents.jsx/Tables";
 
 const IndivudualCandidate = () => {
+  
   return (
     <div className="md:flex bg-gray-900 min-h-screen  max-h-fit text-white">
       <div className="hidden md:flex">

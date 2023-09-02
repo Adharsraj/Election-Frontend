@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import arrowright from "../../assets/arrowright.json";
 import votebox from "../../assets/votebox.json";
 import usericon from "../../assets/usericon.json";
@@ -32,6 +32,7 @@ import {
   UserIcon,
   FlagIcon,
   ExclamationTriangleIcon,
+  StarIcon,
 } from "@heroicons/react/24/solid";
 import {
   ChevronRightIcon,
@@ -45,9 +46,16 @@ export function SidebarWithCta() {
   const [open, setOpen] = React.useState(0);
   const [openAlert, setOpenAlert] = React.useState(true);
   const [navopen, setnavopen] = useState(true);
+  const [ldetails, setLdetails] = useState({});
   const handleOpen = (value) => {
     setOpen(open === value ? 0 : value);
   };
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("User"));
+    console.log("user", user);
+    setLdetails(user);
+  }, []);
 
   return (
     <>
@@ -63,13 +71,20 @@ export function SidebarWithCta() {
       </div> */}
 
             <div className=" text-center">
-              <Lottie
-                loop={true}
-                animationData={usericon}
+              <img
+                src={ldetails ? ldetails.url : ""}
+                alt=""
+                srcset=""
                 className="border h-32 bg-white w-32 mx-auto rounded-full"
               />
-              <h1 className="pt-5 text-3xl">Tom Cruise</h1>
-              <h2 className="text-lg pt-3 pb-3 uppercase">President</h2>
+
+              <h1 className="pt-5 text-3xl">
+                {" "}
+                {ldetails ? ldetails.username : ""}{" "}
+              </h1>
+              <h2 className="text-lg pt-3 pb-3 uppercase">
+                {ldetails ? ldetails.currentposition : ""}{" "}
+              </h2>
 
               <h3>
                 398 Wallace <br /> Ranch Suite 593 <br />
@@ -128,6 +143,11 @@ export function SidebarWithCta() {
 }
 
 export function SidebarWithCtaAdmin() {
+  const [open, setOpen] = React.useState(0);
+
+  const handleOpen = (value) => {
+    setOpen(open === value ? 0 : value);
+  };
   return (
     <>
       <Card className="xl:h-[80%] xl:my-auto ml-3 w-full  max-w-[20rem] hidden   shadow-xl md:flex flex-col xl:justify-center shadow-blue-gray-900/5 bg-transparent  text-white">
@@ -150,14 +170,56 @@ export function SidebarWithCtaAdmin() {
                   Dashboard
                 </ListItem>
               </Link>
-              <Link to="/admin/tables">
-                <ListItem className="text-white flex border mt-2  text-lg">
-                  <ListItemPrefix>
-                    <TableCellsIcon className="h-6 w-6 " />
-                  </ListItemPrefix>
-                  Tables
+
+              <Accordion
+                open={open === 2}
+                icon={
+                  <ChevronDownIcon
+                    strokeWidth={2.5}
+                    className={`mx-auto h-4 w-4 text-white transition-transform ${
+                      open === 2 ? "rotate-180" : ""
+                    }`}
+                  />
+                }
+              >
+                <ListItem className="p-0 border mt-2" selected={open === 2}>
+                  <AccordionHeader
+                    onClick={() => handleOpen(2)}
+                    className="border-b-0 text-white p-3"
+                  >
+                    <ListItemPrefix>
+                      <TableCellsIcon className="h-6 w-6" />
+                    </ListItemPrefix>
+                    <Typography
+                      color="blue-gray"
+                      className="mr-auto text-white text-lg font-semibold"
+                    >
+                      Tables
+                    </Typography>
+                  </AccordionHeader>
                 </ListItem>
-              </Link>
+                <AccordionBody className="py-1 text-white">
+                  <List className="p-0">
+                    <Link to="/admin/userlist">
+                      <ListItem className="text-white">
+                        <ListItemPrefix>
+                          <StarIcon strokeWidth={3} className="h-3 text w-5" />
+                        </ListItemPrefix>
+                        User Tables
+                      </ListItem>
+                    </Link>
+                    <Link to="/admin/electionlist">
+                      <ListItem className="text-white">
+                        <ListItemPrefix className="text-white">
+                          <StarIcon strokeWidth={3} className="h-3 w-5 " />
+                        </ListItemPrefix>
+                        Election Tables
+                      </ListItem>
+                    </Link>
+                  </List>
+                </AccordionBody>
+              </Accordion>
+
               <Link to="/admin/results">
                 <ListItem className="text-white border mt-2 flex   text-lg">
                   <ListItemPrefix>
@@ -174,7 +236,7 @@ export function SidebarWithCtaAdmin() {
                   Not Voted List
                 </ListItem>
               </Link>
-             
+
               <Link to="/admin/createuser">
                 <ListItem className="text-white border mt-2 flex   text-lg">
                   <ListItemPrefix>
