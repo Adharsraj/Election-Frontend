@@ -43,7 +43,7 @@ const Router= createBrowserRouter([
         element:<ResultsUser/>
     },
     {
-        path:"/indivudualresult",
+        path:"/indivudualresult/:id",
         element:<IndivudualResult/>
     },
     {

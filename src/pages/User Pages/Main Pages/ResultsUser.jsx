@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SidebarWithCta } from "../../../Components/UserComponents.jsx/SideNavbar";
 import { NavbarDefault } from "../../../Components/UserComponents.jsx/MobileNavbar";
 import {
@@ -9,8 +9,76 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
+import axiosInstance from "../../../configs/axiosInstance";
+import { Spin } from "antd";
 
 const ResultsUser = () => {
+  const [electionData, setElectionData] = useState([]);
+  const [loading, setLoading] = useState(true); // State to track loading status
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        const response = await axiosInstance.get("/api/user/electiondata", {
+          headers,
+        });
+        console.log("response",response)
+        setElectionData(response?.data?.election);
+        setLoading(false); // Set loading to false once data is fetched
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false); // Set loading to false if an error occurs
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const [allelections, setAllelections] = useState([{}]);
+  useEffect(() => {
+    const getAllElections = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        const response = await axiosInstance.get("/api/admin/vote", {
+          headers,
+        });
+
+        console.log("object",response)
+        setAllelections(response.data.votes);
+        setLoading(false)
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAllElections();
+  }, []);
+  const currentDate = new Date(); // Get the current date
+  const currentYear = currentDate.getFullYear(); // Get the current year
+  
+  // Filter out the elections where the year of endDate is equal to the current year
+  const filteredElections = allelections.filter((m) => new Date(m.endDate).getFullYear() === currentYear);
+  
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
   return (
     <div className="md:flex bg-gray-900 min-h-screen  max-h-fit text-white">
       <div className="hidden md:flex">
@@ -23,90 +91,61 @@ const ResultsUser = () => {
         <h1 className=" text-4xl text-gray-400 lg:text-6xl lg:pt-10 text-center pt-5">
           Welcome to Results 2023
         </h1>
-        <div className="flex flex-wrap gap-8 justify-center pt-10 pb-10 items-center">
+        {loading?
+        
+        <div className="flex justify-center items-center pt-5">
+            <Spin size="large" />
+          </div>
+:   <div className="flex flex-wrap gap-8 justify-center pt-10 pb-10 items-center">
 {/* 1 */}
+{filteredElections.map((m) => (
+
 <div className="bg-green-200 text-black w-[300px] rounded-xl ">
-          <Typography className="text-2xl font-bold uppercase pt-2">
-            PRESIDENT ELECTION
+          <Typography className="text-2xl font-bold uppercase pt-2 pb-7">
+{m.electionName}
           </Typography>
 
-          <CardFooter className="flex flex-col  items-center justify-between">
+          {/* <CardFooter className="flex flex-col  items-center justify-between">
             <Typography className=" font-bold uppercase ">
               Candidates
             </Typography>
 
             <div className="flex items-center -space-x-3  mx-auto">
-              <Tooltip content="Natali Craig">
-                <Avatar
-                  size="sm"
-                  variant="circular"
-                  alt="natali craig"
-                  src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1061&q=80"
-                  className="border-2 border-white hover:z-10"
-                />
-              </Tooltip>
-              <Tooltip content="Tania Andrew">
-                <Avatar
-                  size="sm"
-                  variant="circular"
-                  alt="tania andrew"
-                  src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-                  className="border-2 border-white hover:z-10"
-                />
-              </Tooltip>
-              <Tooltip content="Tania Andrew">
-                <Avatar
-                  size="sm"
-                  variant="circular"
-                  alt="tania andrew"
-                  src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-                  className="border-2 border-white hover:z-10"
-                />
-              </Tooltip>
-              <Tooltip content="Natali Craig">
-                <Avatar
-                  size="sm"
-                  variant="circular"
-                  alt="natali craig"
-                  src="https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1061&q=80"
-                  className="border-2 border-white hover:z-10"
-                />
-              </Tooltip>
-              <Tooltip content="Tania Andrew">
-                <Avatar
-                  size="sm"
-                  variant="circular"
-                  alt="tania andrew"
-                  src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-                  className="border-2 border-white hover:z-10"
-                />
-              </Tooltip>
-              <Tooltip content="Tania Andrew">
-                <Avatar
-                  size="sm"
-                  variant="circular"
-                  alt="tania andrew"
-                  src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-                  className="border-2 border-white hover:z-10"
-                />
-              </Tooltip>
-            </div>
-          </CardFooter>
+                    {m.representatives?.map((d) => (
+                      <Tooltip content={d.username}>
+                        <Avatar
+                          size="sm"
+                          variant="circular"
+                          alt=""
+                          src={d.url}
+                          className="border-2 border-white hover:z-10"
+                        />
+                      </Tooltip>
+                    ))}
+                 
+                  </div>
+          </CardFooter> */}
           <div className="flex justify-between px-5">
-            <Typography className="font-normal border border-black rounded-xl p-1 w-28">
-              <h2 className="uppercase font-bold">Start date</h2>
-              
-              <h2>January 10</h2>
-            </Typography>
-            <Typography className="font-normal  border border-black rounded-xl p-1 w-28">
-              <h2 className="uppercase font-bold">End date</h2>
-              <h2>January 30</h2>
-            </Typography>
-          </div>
-          <Link to="/indivudualresult">
+                  <Typography className="font-normal border border-black  p-1 w-28">
+                    <h2 className="uppercase font-bold">Start date</h2>
+
+                    <h2>{`${
+                      monthNames[new Date(m.startDate).getMonth()]
+                    } ${new Date(m.startDate).getDate()}`}</h2>
+                  </Typography>
+                  <Typography className="font-normal  border border-black  p-1 w-28">
+                    <h2 className="uppercase font-bold">End date</h2>
+                    <h2>{`${
+                      monthNames[new Date(m.endDate).getMonth()]
+                    } ${new Date(m.endDate).getDate()}`}</h2>
+                  </Typography>
+                </div>
+                <Link to={`/indivudualresult/${m._id}`}>
           <Button className="border w-full pt-4 mt-3 text-sm ">show result</Button>
           </Link>
 </div>
+          ))}
+
 {/* 2 */}
 
 
@@ -115,7 +154,8 @@ const ResultsUser = () => {
        
 
 
-        </div>
+        </div>}
+     
 
       </div>
     </div>
