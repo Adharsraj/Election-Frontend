@@ -27,7 +27,7 @@ import axiosInstance from "../../configs/axiosInstance";
 import { useParams } from "react-router-dom";
 import { Spin } from "antd";
 
-const itemsPerPage = 2; // Number of items per page
+const itemsPerPage = 5; // Number of items per page
 
 const TABS = [
   {
@@ -874,6 +874,323 @@ useEffect(() => {
   </div>
 )}
 </div> */}
+    </>
+  );
+}
+
+
+
+
+
+export function IndivudualNonvoters() {
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserPhoto, setSelectedUserPhoto] = useState(null);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [remainingVoters, setRemainingVoters] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showNonvoterstable, setShownonvotersTable] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+
+
+
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(TABLE_ROWS.length / itemsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+
+  const [collection, setCollection] = useState([]);
+  const [viewPage, setViewPage] = useState(false);
+  const [elections, setElections] = useState([]);
+  const [selectedElection, setSelectedElection] = useState(null);
+  const [selectedVote, setSelectedVote] = useState(null);
+  const [votedPersons, setVotedPersons] = useState([]);
+  const [nameToCheck, setNameToCheck] = useState("");
+  const [isNameIncluded, setIsNameIncluded] = useState(false);
+  const [voteSubmitted, setVoteSubmitted] = useState(false);
+  const [samp, setSamp] = useState([]);
+  const [myId, setMyId] = useState("");
+  const[votedids,setVotedIds]=useState([])
+  const [notvotedlist,setNotvotedList]=useState([])
+
+  const { id } = useParams();
+  const userid = localStorage.getItem("User");
+  const exact = JSON.parse(userid);
+
+  useEffect(() => {
+    console.log("object", id);
+
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        console.log("object");
+
+        const response = await axiosInstance.get(
+          `/api/admin/collections/${id}`,
+          { headers }
+        );
+        console.log("response", response);
+        setCollection(response.data);
+
+        if (response?.data?.userid?.includes(exact._id)) {
+          setRemainingVoters(true);
+        } else {
+          setViewPage(true);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setViewPage(true);
+      }
+    };
+
+    fetchData();
+  }, [id]);
+
+  useEffect(() => {
+    const fetchElections = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        const response = await axiosInstance.get("/api/admin/electiondata", {
+          headers,
+        });
+        console.log("response", response);
+        setLoading(false);
+        setElections(response.data.election);
+        const foundElection = response.data.election.find(
+          (election) => election._id === id
+        );
+        setSelectedElection(foundElection);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchElections();
+  }, [id]);
+
+  useEffect(() => {
+    const getVotedPersons = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        const re = await axiosInstance.get(
+          `/api/admin/getsingleelection/${id}`,
+          { headers }
+        );
+        console.log("res", re);
+
+        const response = await axiosInstance.get("/api/admin/electiondata", {
+          headers,
+        });
+        const res = await axiosInstance.get("/api/admin/vote", { headers });
+        const votedPersonsData = res.data.votes;
+        const m = res.data.votes.map((m) => {
+          setMyId(m._id);
+        });
+
+        setVotedPersons(votedPersonsData);
+        const Username = JSON.parse(localStorage.getItem("User"));
+        const namesArray = votedPersonsData.map((vote) => vote.name[0]);
+        const included = namesArray.includes(Username.name);
+
+        setIsNameIncluded(included);
+      } catch (error) {
+        console.error("Error fetching voted persons:", error);
+      }
+    };
+
+    getVotedPersons();
+  }, [nameToCheck, samp]);
+
+  // const handleVoteChange = (personId) => {
+  //   setSelectedVote(personId);
+  // };
+
+ 
+
+
+ 
+
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+    
+      const res = await axiosInstance.get(`/api/admin/collections/${id}`, {
+        headers,
+      });
+      setSamp("res")
+      setVotedIds(res.data.userid);
+
+      console.log(res.data.userid);    
+      
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  fetchData();
+}, [id,samp]);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        const response = await axiosInstance.get("/api/admin/showuser", {
+          headers,
+        });
+  
+  
+        const idArray = response.data.showUser.map((item) => item._id);
+        console.log("idArray", idArray);
+  
+        // Filter the IDs that are not in votedIds
+        const idsNotInVoted = idArray.filter((id) => !votedids.includes(id));
+        console.log("idsNotInVoted", idsNotInVoted);
+  
+        // Fetch and log details for IDs not voted
+        const detailsNotVoted = response.data.showUser.filter(
+          (item) => idsNotInVoted.includes(item._id)
+        );
+        setNotvotedList(detailsNotVoted)
+        console.log("Details for IDs not voted:", detailsNotVoted);
+        
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [votedids]);
+  
+  const totalPages = Math.ceil(notvotedlist.length / itemsPerPage);
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const displayedRows = notvotedlist.slice(startIndex, endIndex);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  return (
+    <>
+      {!remainingVoters ? (
+        <div className="">
+          <h1 className=" text-4xl text-gray-400 lg:text-6xl pb-5 text-center pt-5">
+            Select a person to vote
+          </h1>
+
+         
+        </div>
+      ) : (
+        <>
+          
+          <h1 className="text-3xl pt-5 pb-5">
+            {notvotedlist.length} more people from your community are left to vote
+          </h1>
+          <Button
+            className="bg-red-500 mb-3 mt-3"
+            onClick={() => setShownonvotersTable(!showNonvoterstable)}
+          >
+            {showNonvoterstable ? "Hide" : "Show"} Persons left to vote{" "}
+          </Button>
+          {showNonvoterstable && (
+        <Card className="md:w-[60%] mx-auto bg-black text-white pb-10 mb-10">
+          <CardBody className="overflow-scroll px-0">
+            <table className="w-full min-w-max table-auto text-left">
+              {/* ... Your table header ... */}
+              <thead>
+                <tr>
+                  <th className="cursor-pointer text-center font-bold border-blue-gray-100 bg-red-500 p-4 transition-colors hover:bg-blue-gray-50">
+                    <Typography
+                      variant=""
+                      color="black"
+                      className="text-2xl text-center gap-2 font-bold leading-none opacity-70"
+                    >
+                      Persons left to vote
+                    </Typography>
+                  </th>
+                 
+                </tr>
+              </thead>
+              <tbody>
+                {displayedRows.map(({ username, email,url }) => (
+                  <tr key={username}>
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <Avatar src={url} alt={username} size="sm" />
+                        <div className="flex flex-col">
+                          <Typography
+                            variant="small"
+                            color="white"
+                            className="font-normal"
+                          >
+                            {username}
+                          </Typography>
+                          <Typography
+                            variant="small"
+                            color="white"
+                            className="font-normal opacity-70"
+                          >
+                            {email}
+                          </Typography>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {/* Pagination controls */}
+            <div className="mt-4  flex justify-center">
+              {Array.from({ length: totalPages }).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handlePageChange(index + 1)}
+                  className={`mx-1 px-3 py-1 rounded ${
+                    currentPage === index + 1
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 text-gray-700"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+          
+        </>
+      )}
+     
     </>
   );
 }

@@ -16,6 +16,8 @@ import AdminTables from "./pages/Admin Pages/AdminTables"
 import AdminResults from "./pages/Admin Pages/AdminResults"
 import AdminUserlist from "./pages/Admin Pages/AdminUserlist"
 import AdminElectionlist from "./pages/Admin Pages/AdminElectionlist"
+import SingleNonvoters from "./pages/Admin Pages/SingleNonvoters"
+import AdminSingleResult from "./pages/Admin Pages/AdminSingleResult"
 
 const Router= createBrowserRouter([
     {
@@ -59,6 +61,10 @@ const Router= createBrowserRouter([
         element:<AdminResults/>
     },
     {
+        path:"/admin/indivudualresult/:id",
+        element:<AdminSingleResult/>
+    },
+    {
         path:"/admin/createcandidate",
         element:<AdminCreateCandidate/>
     },
@@ -77,6 +83,10 @@ const Router= createBrowserRouter([
     {
         path:"/admin/offlinevote",
         element:<AdminOfflineVote/>
+    },
+    {
+        path:"/admin/nonvoters/:id",
+        element:<SingleNonvoters/>
     },
     {
         path:"/admin/userlist",

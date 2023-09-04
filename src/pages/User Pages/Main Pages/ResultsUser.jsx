@@ -105,26 +105,7 @@ const ResultsUser = () => {
 {m.electionName}
           </Typography>
 
-          {/* <CardFooter className="flex flex-col  items-center justify-between">
-            <Typography className=" font-bold uppercase ">
-              Candidates
-            </Typography>
 
-            <div className="flex items-center -space-x-3  mx-auto">
-                    {m.representatives?.map((d) => (
-                      <Tooltip content={d.username}>
-                        <Avatar
-                          size="sm"
-                          variant="circular"
-                          alt=""
-                          src={d.url}
-                          className="border-2 border-white hover:z-10"
-                        />
-                      </Tooltip>
-                    ))}
-                 
-                  </div>
-          </CardFooter> */}
           <div className="flex justify-between px-5">
                   <Typography className="font-normal border border-black  p-1 w-28">
                     <h2 className="uppercase font-bold">Start date</h2>
