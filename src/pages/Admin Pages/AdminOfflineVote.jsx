@@ -121,7 +121,7 @@ const handleAddNames = async () => {
       electionId,
       names: newNames,
     });
-
+    
     // Handle the response from the backend if needed
     console.log(response.data);
 

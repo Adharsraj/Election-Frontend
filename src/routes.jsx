@@ -18,6 +18,7 @@ import AdminUserlist from "./pages/Admin Pages/AdminUserlist"
 import AdminElectionlist from "./pages/Admin Pages/AdminElectionlist"
 import SingleNonvoters from "./pages/Admin Pages/SingleNonvoters"
 import AdminSingleResult from "./pages/Admin Pages/AdminSingleResult"
+import SignInComponent from "./pages/User Pages/Login/SignInComponent"
 
 const Router= createBrowserRouter([
     {
@@ -95,6 +96,10 @@ const Router= createBrowserRouter([
     {
         path:"/admin/electionlist",
         element:<AdminElectionlist/>
+    },
+    {
+        path:"/demo",
+        element:<SignInComponent/>
     },
 ])
 export default Router

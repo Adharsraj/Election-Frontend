@@ -4,82 +4,69 @@ import Lottie from "lottie-react";
 import otpgif from "../../../assets/otp.json";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../../../configs/axiosInstance";
+import { message } from "antd";
 const LoginWTPhone = () => {
-  const navigate=useNavigate()
-  const [message, setMessage] = useState("");
-  const [otpmobilenumber, setPhoneNumber] = useState("");
+  const navigate = useNavigate();
   const [isOtpSent, setIsOtpSent] = useState(false);
+  const [otpmobilenumber, setOtpMobileNumber] = useState("");
   const [otp, setOtp] = useState("");
-  const [storedotp, setStoredotp] = useState("");
-  const [userData, setUserData] = useState([]);
-  const [submit, setSubmit] = useState(false);
-  const [otpVerificationError, setOtpVerificationError] = useState(false); 
-  const [sucessmsg, setSucessmsg] = useState("");
-  const [errormessage,setErrormessage]=useState("")
+  // const [message, setMessage] = useState("");
 
-
-  const handleSendOTP = async () => {
-    console.log("phoneNumber", otpmobilenumber);
+  const sendOTP = async () => {
     try {
       const response = await axiosInstance.post("/api/admin/send-otp", {
         otpmobilenumber,
       });
-
-      setSucessmsg("otp send sucessfully");
-      console.log(response.data);
-      console.log("this is rrsponse", response.data.otp);
-      setUserData(response.data);
-      setStoredotp(response.data.otp);
-      setPhoneNumber("")
-
+      // setMessage(response.data.message);
       setIsOtpSent(true);
-
-
-
     } catch (error) {
       console.error("Error sending OTP:", error);
-      setMessage("Error sending OTP! Invalid Phone Number.");
+      message.error("Error verifiying phonenumber")
     }
   };
 
-  const handleVerifyOTP = () => {
-    setSucessmsg("");
-    console.log(otp);
-    console.log(storedotp);
-    console.log("im inside handleverify", userData);
-    if (otp == storedotp) {
-      console.log("ok");
-      setOtpVerificationError(false); // Reset OTP verification error state
+  const verifyOTP = async () => {
+    try {
+      const response = await axiosInstance.post("/api/admin/verify-otp", {
+        otpmobilenumber,
+        otp,
+      });
+      // setMessage(response.data.message);
+      console.log(response.data);
+      message.success("Number Verified,Login successfull")
 
-      setSubmit(true);
-      if (userData.token) {
-        localStorage.setItem("token", userData.token);
-        localStorage.setItem("User", JSON.stringify(userData.User));
-        if (userData.User.role === "user") {
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("User", JSON.stringify(response.data.User));
+        if (response.data.User.role === "user") {
           navigate("/home");
-        } else if (userData.User.role === "admin") {
+        } else if (response.data.User.role === "admin") {
           navigate("/admin/home");
         } else {
           console.log("invalid person");
         }
-        setIsLoading(false);
       } else {
         console.log("invalid token");
+        message.error("Invalid Otp")
+
       }
-    } else {
-      console.log("nop");
-      setErrormessage("Invalid otp");
-      setOtpVerificationError(true);
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      message.error("Error verifiying Otp")
     }
   };
+
+
   return (
     <div className="flex flex-col md:flex-row justify-center text-center items-center shadow-2xl  h-screen">
       <Card className="px-3 md:border">
+        {/* <p className="bg-gray">{message}</p> */}
+
         <div className="md:flex">
           <div className="md:text-6xl text-4xl">
             <h1 className="pt-5 pb-5 font-bold w-[300px]  md:hidden">
               {" "}
-                Login using phone number
+              Login using phone number
             </h1>
             <div className="w-60 md:w-[400px]   mx-auto">
               <Lottie loop={true} animationData={otpgif} />
@@ -88,7 +75,9 @@ const LoginWTPhone = () => {
           <div className="flex flex-col  pb-6 px-3 items-center justify-center gap-5 pt-6">
             <h1 className="pt-5 pb-5 text-3xl font-extrabold hidden md:flex">
               {" "}
-              {!isOtpSent?"Login using phone number":"otp send sucessfully check your phone"} 
+              {!isOtpSent
+                ? "Login using phone number"
+                : "otp send sucessfully check your phone"}
             </h1>
             {!isOtpSent ? (
               <>
@@ -96,11 +85,12 @@ const LoginWTPhone = () => {
                   size="lg"
                   className="text-xl text-center"
                   label="Enter Mobile Number"
-                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  value={otpmobilenumber}
+                  onChange={(e) => setOtpMobileNumber(e.target.value)}
                   required
                 />
                 <Button
-                  onClick={handleSendOTP}
+                  onClick={sendOTP}
                   className="flex items-center justify-center gap-3 "
                 >
                   Send otp
@@ -112,12 +102,12 @@ const LoginWTPhone = () => {
                   size="lg"
                   className="text-xl text-center"
                   label="Enter Otp "
-                  value={otp} 
+                  value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                   required
                 />
                 <Button
-                  onClick={handleVerifyOTP}
+                  onClick={verifyOTP}
                   className="flex items-center bg-green-300 justify-center gap-3 "
                 >
                   Verify otp

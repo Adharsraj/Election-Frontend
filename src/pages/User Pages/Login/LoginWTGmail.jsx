@@ -4,18 +4,24 @@ import Lottie from "lottie-react";
 import mailgif from "../../../assets/mail.json";
 import { Link, useNavigate } from "react-router-dom";
 import axiosInstance from "../../../configs/axiosInstance";
+import { message } from "antd";
 
 const LoginWTGmail = () => {
   const navigate=useNavigate()
   const [email,setEmail]=useState("")
   const [otp, setOtp] = useState('');
   const[status,changeStatus]=useState(false)
-const [message,setMessage]=useState("")
+// const [message,setMessage]=useState("")
   const sendOtp=async()=>{
-    console.log("i am email",email)
-  const res=await axiosInstance.post("/api/admin/sendemailotp",{email})
-  console.log(res)
-  changeStatus(true)
+  try {
+      console.log("i am email",email)
+    const res=await axiosInstance.post("/api/admin/sendemailotp",{email})
+    console.log(res)
+    changeStatus(true)
+  } catch (error) {
+    console.log(error)
+    message.error("Invalid email")
+  }
 
   }
   const verifyOtp = async () => {
@@ -23,12 +29,11 @@ const [message,setMessage]=useState("")
     try {
         const response=await axiosInstance.post("/api/admin/verifyemailotp",{email,otp})
         console.log(response)
+        message.success("Login successfull")
         if (response.data.verified) {
           console.log("inside verified")
-          setMessage('OTP verified successfully');
           if (response.data.token) {
             console.log("inside token")
-
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("User", JSON.stringify(response.data.User));
             if (response.data.User.role === "user") {
@@ -56,7 +61,8 @@ const [message,setMessage]=useState("")
           <div className="md:text-6xl text-4xl">
             <h1 className="pt-5 pb-5 font-bold w-[300px]  md:hidden">
               {" "}
-              Login using Email
+              {!status?
+"Login using Email":"Enter the Otp send to email"}
             </h1>
             <div className="w-60 md:w-[400px]  mx-auto">
               <Lottie loop={true} animationData={mailgif} />
@@ -65,8 +71,9 @@ const [message,setMessage]=useState("")
           <div className="flex flex-col  pb-6 px-3 items-center justify-center gap-5 pt-6">
             <h1 className="pt-5 pb-5  w-[300px] text-3xl font-extrabold hidden md:flex">
               {" "}
-              Login using Email{" "}
-            </h1>
+              {!status?
+"Login using Email":"Enter the Otp send to email"}   
+         </h1>
             {!status?
             <>
             <Input size="lg" label="Enter Email " name="email" onChange={(e)=>setEmail(e.target.value)} />
