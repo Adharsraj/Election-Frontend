@@ -60,7 +60,7 @@ export function SidebarWithCta() {
   return (
     <>
       {navopen ? (
-        <Card className="xl:h-[80%] xl:my-auto ml-3 w-full  max-w-[20rem] hidden  p-4 shadow-xl md:flex flex-col  shadow-blue-gray-900/5 bg-transparent  text-white">
+        <Card className="xl:h-[80%] xl:my-auto xl:justify-center ml-3 w-full  max-w-[20rem] hidden  p-4 shadow-xl md:flex flex-col  shadow-blue-gray-900/5 bg-transparent  text-white">
           <div className="fixed  bg-yellow-800 rounded-xl p-2 py-10 ">
             {/* <div className="mb-2 p-4 flex items-center justify-between">
         <Typography variant="h5" className="uppercase invisible text-3xl mx-auto" color="">
@@ -97,6 +97,14 @@ export function SidebarWithCta() {
                       <HomeIcon className="h-8 w-8 " />
                     </ListItemPrefix>
                     Home
+                  </ListItem>
+                </Link>
+                <Link to="/nonvoters">
+                  <ListItem className="text-white border mt-2 flex justify-center items-center  text-2xl">
+                    <ListItemPrefix>
+                      <AcademicCapIcon className="h-8 w-8 " />
+                    </ListItemPrefix>
+                    Non Voters
                   </ListItem>
                 </Link>
                 <Link to="/result">

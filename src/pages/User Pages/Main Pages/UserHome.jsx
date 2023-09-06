@@ -16,6 +16,7 @@ import axiosInstance from "../../../configs/axiosInstance";
 const UserHome = () => {
   const [electionData, setElectionData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userId,setUserId]=useState("")
   const monthNames = [
     "January",
     "February",
@@ -42,6 +43,7 @@ const UserHome = () => {
         });
         console.log("response", response);
         setElectionData(response?.data?.election);
+        console.log(response?.data?.election)
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -60,6 +62,54 @@ console.log(currentDate)
   );
   console.log(activeElections);
 
+
+
+
+
+
+
+  useEffect(() => {
+    const getAllElections = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        const response = await axiosInstance.get("/api/user/electiondata", {
+          headers,
+        });
+        const id = JSON.parse(localStorage.getItem("User"))
+        console.log(id)
+        setUserId(id._id)
+
+  console.log(response.data.election)
+        const isVoted = response.data.election.some((election) => {
+          return election?.userid?.includes(id);
+        });
+  
+        if (isVoted) {
+          // User voted in the specific election
+          console.log("voted");
+          // You can set some state or perform other actions here
+        } else {
+          // User did not vote in the specific election
+          console.log("not voted");
+          // You can set some state or perform other actions here
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAllElections();
+  }, []);
+  
+
+
+useEffect(()=>{
+ 
+},[])
+
+  
   return (
     <div className="md:flex bg-gray-900 min-h-screen  max-h-fit text-white">
       <div className="hidden md:flex">
@@ -84,12 +134,15 @@ console.log(currentDate)
                 <Typography className="text-2xl font-bold uppercase pt-2">
                   {m.electionName}
                 </Typography>
-
                 <CardFooter className="flex flex-col  items-center justify-between">
                   <Typography className=" font-bold uppercase ">
                     Candidates
                   </Typography>
-
+                  {/* {m.userid?.includes(userId) ? (
+    <h1>Voted</h1>
+  ) : (
+    <h1>Not Voted</h1>
+  )} */}
                   <div className="flex items-center -space-x-3  mx-auto">
                     {m.representatives.map((d) => (
                       <Tooltip content={d.username}>
@@ -120,8 +173,27 @@ console.log(currentDate)
                     } ${new Date(m.endDate).getDate()}`}</h2>
                   </Typography>
                 </div>
-
-                <CardFooter className="pt-3">
+{m.userid?.includes(userId)? <CardFooter className="pt-3">
+                 
+                    <Button
+                      size="lg"
+                      fullWidth={true}
+                      disabled={true}
+                      className="relative bg-black"
+                    >
+                      
+                        <>
+                          Already voted
+                          <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 text-red-500 pointer-events-none">
+                          </span>
+                        </>
+                    
+                    </Button>
+                
+                
+                
+                </CardFooter>:
+             <CardFooter className="pt-3">
                   {new Date(m.startDate) > currentDate ||
                   new Date(m.endDate) <= currentDate ? (
                     <Button
@@ -159,6 +231,7 @@ console.log(currentDate)
                   )}
                 
                 </CardFooter>
+}   
               </div>
             ))}
           

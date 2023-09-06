@@ -19,6 +19,8 @@ import AdminElectionlist from "./pages/Admin Pages/AdminElectionlist"
 import SingleNonvoters from "./pages/Admin Pages/SingleNonvoters"
 import AdminSingleResult from "./pages/Admin Pages/AdminSingleResult"
 import SignInComponent from "./pages/User Pages/Login/SignInComponent"
+import NonVoters from "./pages/User Pages/Main Pages/NonVoters"
+import SingleNotVoted from "./pages/User Pages/Main Pages/SingleNotVoted"
 
 const Router= createBrowserRouter([
     {
@@ -44,6 +46,14 @@ const Router= createBrowserRouter([
     {
         path:"/result",
         element:<ResultsUser/>
+    },
+    {
+        path:"/nonvoters",
+        element:<NonVoters/>
+    },
+    {
+        path:"/nonvoters/:id",
+        element:<SingleNotVoted/>
     },
     {
         path:"/indivudualresult/:id",

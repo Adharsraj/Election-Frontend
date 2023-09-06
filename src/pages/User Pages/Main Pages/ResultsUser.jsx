@@ -80,13 +80,15 @@ const ResultsUser = () => {
     "December",
   ];
   return (
+    
     <div className="md:flex bg-gray-900 min-h-screen  max-h-fit text-white">
-      <div className="hidden md:flex">
+      <div className="hidden  md:flex">
         <SidebarWithCta />
       </div>
       <div className="md:hidden">
         <NavbarDefault />
       </div>
+      
       <div className="   text-center flex flex-col justify-center items-center  w-full  px-4   ">
         <h1 className=" text-4xl text-gray-400 lg:text-6xl lg:pt-10 text-center pt-5">
           Welcome to Results 2023

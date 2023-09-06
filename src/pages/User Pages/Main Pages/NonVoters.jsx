@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { SidebarWithCta } from "../../../Components/UserComponents.jsx/SideNavbar";
+import { NavbarDefault } from "../../../Components/UserComponents.jsx/MobileNavbar";
+import { Spin } from "antd";
+
 import {
   Avatar,
   Button,
@@ -7,12 +11,9 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { Link } from "react-router-dom";
-import { SidebarWithCtaAdmin } from "../../Components/UserComponents.jsx/SideNavbar";
-import { NavbarDefaultAdmin } from "../../Components/UserComponents.jsx/MobileNavbar";
-import { Spin } from "antd";
-import axiosInstance from "../../configs/axiosInstance";
+import axiosInstance from "../../../configs/axiosInstance";
 
-const AdminNotVoted = () => {
+const NonVoters = () => {
   const [electionData, setElectionData] = useState([]);
   const [loading, setLoading] = useState(true);
   const monthNames = [
@@ -36,7 +37,7 @@ const AdminNotVoted = () => {
         const headers = {
           Authorization: `Bearer ${token}`,
         };
-        const response = await axiosInstance.get("/api/admin/electiondata", {
+        const response = await axiosInstance.get("/api/user/electiondata", {
           headers,
         });
         console.log("response", response);
@@ -52,21 +53,22 @@ const AdminNotVoted = () => {
   }, []);
 
   const currentDate = new Date();
-
+console.log(currentDate)
   const activeElections = electionData.filter(
-    (election) => new Date(election.endDate) > currentDate
+    (election) => new Date(election.endDate) >= currentDate
+
   );
   console.log(activeElections);
 
   return (
     <div className="md:flex bg-gray-900 min-h-screen  max-h-fit text-white">
       <div className="hidden md:flex">
-        <SidebarWithCtaAdmin />
+        <SidebarWithCta />
       </div>
       <div className="md:hidden">
-        <NavbarDefaultAdmin />
+        <NavbarDefault />
       </div>
-      <div className="text-center flex flex-col justify-center items-center  w-full  px-4">
+      <div className="   text-center flex flex-col justify-center items-center  w-full  px-4   ">
         <h1 className=" text-4xl text-gray-400 lg:text-6xl lg:pt-10 text-center pt-5">
            Non-voters list
         </h1>
@@ -145,7 +147,7 @@ const AdminNotVoted = () => {
                       )}
                     </Button>
                   ) : (
-                    <Link to={`/admin/nonvoters/${m._id}`}>
+                    <Link to={`/nonvoters/${m._id}`}>
                       <Button
                         size="lg"
                         fullWidth={true}
@@ -510,4 +512,4 @@ const AdminNotVoted = () => {
   );
 };
 
-export default AdminNotVoted;
+export default NonVoters;
