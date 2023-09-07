@@ -41,6 +41,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Lottie from "lottie-react";
 import { Link } from "react-router-dom";
+import axiosInstance from "../../configs/axiosInstance";
 
 export function SidebarWithCta() {
   const [open, setOpen] = React.useState(0);
@@ -53,10 +54,58 @@ export function SidebarWithCta() {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("User"));
-    console.log("user", user);
+    console.log("user", user._id);
     setLdetails(user);
   }, []);
 
+
+
+
+  const [electionData, setElectionData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userId,setUserId]=useState("")
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        const response = await axiosInstance.get("/api/user/electiondata", {
+          headers,
+        });
+        console.log("response", response);
+        setElectionData(response?.data?.election);
+        console.log(response?.data?.election)
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  let yesDisplayed = false;
+  if (electionData.some((m) => m.representatives.some((d) => d._id === ldetails._id))) {
+    console.log("object")
+    yesDisplayed = true;
+  }
   return (
     <>
       {navopen ? (
@@ -99,6 +148,12 @@ export function SidebarWithCta() {
                     Home
                   </ListItem>
                 </Link>
+
+
+                {/* {yesDisplayed ? <p>Yes</p> : <p>No</p>} */}
+
+
+{yesDisplayed?
                 <Link to="/nonvoters">
                   <ListItem className="text-white border mt-2 flex justify-center items-center  text-2xl">
                     <ListItemPrefix>
@@ -106,7 +161,9 @@ export function SidebarWithCta() {
                     </ListItemPrefix>
                     Non Voters
                   </ListItem>
-                </Link>
+                </Link>:""
+
+}
                 <Link to="/result">
                   <ListItem className="text-white border mt-2 flex justify-center items-center  text-2xl">
                     <ListItemPrefix>
